@@ -1,0 +1,93 @@
+<!doctype html>
+<html ng-app="todoApp" ng-controller="TodoListController as myApp">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+</head>
+<body style="background-color:#EEFF41">
+
+	<div class="row">
+		<div class="col s12">
+			
+			<div class="card horizontal">
+				<div class="card-stacked">
+					<div class="card-content">
+					
+						<p>You dont have any plan, please select a plan and input your credit information:</p>
+						<br>
+						<form class="col s12">
+							<div class="row">
+								<div class="input-field col s12">
+									<input placeholder="Enter your card number" id="first_name" type="text" class="validate" ng-class="{'invalid':myApp.subscribeInfoValidation.cardNumber.invalid===true}" ng-model="myApp.subscribeInfo.cardNumber"> 
+									<label for="first_name" data-error="{{myApp.subscribeInfoValidation.cardNumber.message}}" >Card Number</label>
+								</div>
+							</div>
+							<div class="row">
+								<div class="input-field col s12">
+									<input placeholder="Enter your card digit" id="first_name" type="text" class="validate" ng-class="{'invalid':myApp.subscribeInfoValidation.cardDigit.invalid===true}" ng-model="myApp.subscribeInfo.cardDigit"> 
+									<label for="first_name" data-error="{{myApp.subscribeInfoValidation.cardDigit.message}}" >Card Digit</label>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="card-action">
+						<div class="col s3">
+							<div class="card horizontal" ng-class="{'blue-grey':myApp.selectedPlan===1}">
+								<div class="card-stacked">
+									<div class="card-content">
+										<p>1 Month</p>
+										<p>Access to all movies and series by only $9,99 per month</p>
+									</div>
+									<div class="card-action">
+										<a href="#" ng-click="myApp.selectPlan(1)">GET IT</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col s3">
+							<div class="card horizontal" ng-class="{'blue-grey':myApp.selectedPlan===2}">
+								<div class="card-stacked">
+									<div class="card-content">
+										<p>6 Months</p>
+										<p>Access to all movies and series by only $8,49 per month</p>
+									</div>
+									<div class="card-action">
+										<a href="#" ng-click="myApp.selectPlan(2)">GET IT</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col s3">
+							<div class="card horizontal" ng-class="{'blue-grey':myApp.selectedPlan===3}">
+								<div class="card-stacked">
+									<div class="card-content">
+										<p>1 Year</p>
+										<p>Access to all movies and series by only $7,29 per month</p>
+									</div>
+									<div class="card-action">
+										<a href="#" ng-click="myApp.selectPlan(3)">GET IT</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col s12 right-align">
+								<a class="waves-effect waves-light btn" ng-click="myApp.subscribe()"><i class="material-icons left">save</i>Ok</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Import jQuery before materialize.js-->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+	<script src="scripts/main.js"></script>
+
+</body>
+</html>
