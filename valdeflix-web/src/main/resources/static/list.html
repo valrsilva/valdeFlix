@@ -4,9 +4,18 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+	<style>
+		[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+		  display: none !important;
+		}
+	</style>
 </head>
-<body style="background-color:#EEFF41">
-
+<body style="background-color:#EEFF41" ng-cloak>
+	
+	<div ng-show="myApp.mediaListNotAvailable === true" style="margin:15px">
+		Service unavailable, try again later.
+	</div>
+	
 	<div class="row">
 		<div class="col s12" ng-repeat="model in myApp.listItems">
 			

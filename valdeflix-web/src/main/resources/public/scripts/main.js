@@ -5,16 +5,10 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
 	myApp.title="";
 	myApp.userName = "";
 	myApp.password = "";
+	myApp.mediaListNotAvailable = false;
 	myApp.listItems = [];
 	myApp.selectedPlan = 0;
-	
-	myApp.SERVICES_PORT = {
-		LOGIN: 8001,
-		MEDIA: 8002,
-		REGISTER: 8003,
-		SUBSCRIPTION: 8004
-	}
-	
+		
 	myApp.registerInfo = {
 		"name": "",
 		"username": "",
@@ -64,7 +58,7 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
 	        	alert('Request failed');
 	      });*/
 		
-    	$http.get("http://localhost:" + myApp.SERVICES_PORT.MEDIA + "/media?idUser=1",{
+    	$http.get("http://localhost:8080/media?idUser=1",{
     		headers: {
     			'Content-type': 'application/json'
     		}
@@ -74,13 +68,17 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
             } else {
             	myApp.listItems = data;
             }
+        }).error(function(data, status) {
+        	if(data.message === 'No instances available for valdeflix-media'){
+        		myApp.mediaListNotAvailable = true;
+        	}
         });
     	
     };
     
     myApp.login = function() {
     	
-    	$http.post("http://localhost:" + myApp.SERVICES_PORT.LOGIN + "/login",{
+    	$http.post("http://localhost:8080/login",{
 			"username":  myApp.userName,
 			"password": myApp.password
 		},{
@@ -107,7 +105,7 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
     
     myApp.register = function() {
     	
-    	$http.post("http://localhost:" + myApp.SERVICES_PORT.REGISTER + "/register", myApp.registerInfo)
+    	$http.post("http://localhost:8080/register", myApp.registerInfo)
     		.success(function(data, status) {
 	            if (data.coderro > 0) {
 	                alert(data.descerro);
@@ -138,7 +136,7 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
     		return false
     	}
     	
-    	$http.post("http://localhost:" + myApp.SERVICES_PORT.SUBSCRIPTION + "/subscription", myApp.subscribeInfo)
+    	$http.post("http://localhost:8080/subscription", myApp.subscribeInfo)
     		.success(function(data, status) {
 	            if (data.coderro > 0) {
 	                alert(data.descerro);
