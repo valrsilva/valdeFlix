@@ -15,7 +15,7 @@ import br.com.vrosendo.services.MediaService;
 
 @RestController
 @RequestMapping("/media")
-public class MediaController {
+public class MediaWebController {
 
 	@Autowired
 	MediaService mediaService;

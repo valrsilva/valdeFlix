@@ -14,7 +14,7 @@ import br.com.vrosendo.services.UserService;
 
 @RestController
 @RequestMapping("/login")
-public class LoginController {
+public class LoginWebController {
 
 	@Autowired
 	UserService userService;

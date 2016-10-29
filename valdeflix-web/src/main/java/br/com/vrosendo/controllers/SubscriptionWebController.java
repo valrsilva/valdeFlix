@@ -13,7 +13,7 @@ import br.com.vrosendo.services.SubscriptionService;
 
 @RestController
 @RequestMapping("/subscription")
-public class SubscriptionController {
+public class SubscriptionWebController {
 
 	@Autowired
 	SubscriptionService subscriptionService;

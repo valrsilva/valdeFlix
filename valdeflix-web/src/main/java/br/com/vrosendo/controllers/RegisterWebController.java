@@ -13,7 +13,7 @@ import br.com.vrosendo.services.UserService;
 
 @RestController
 @RequestMapping("/register")
-public class RegisterController {
+public class RegisterWebController {
 
 	@Autowired
 	UserService userService;

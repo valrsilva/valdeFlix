@@ -39,25 +39,7 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
 	};
 	
 	myApp.carregarDados = function() {
-    	
-		/*$http({
-			method: "GET", 
-			url: "http://localhost:8080/media?idUser=1",
-			responseType:'json',
-			headers: {
-				"Content-Type":"application/json",
-	            "Accept" : "application/json"
-			}}).
-	        then(function(data) {
-	        	if (data.coderro > 0) {
-	                alert(data.descerro);
-	            } else {
-	            	myApp.listItems = data;
-	            }
-	        }, function(data) {
-	        	alert('Request failed');
-	      });*/
-		
+    			
     	$http.get("http://localhost:8080/media?idUser=1",{
     		headers: {
     			'Content-type': 'application/json'
@@ -91,7 +73,7 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
             } else {
             	
             	if(data.msg === "notFound"){
-            		alert("Login fails. Invalid username or password.")
+            		Materialize.toast('Login fails. Invalid username or password.', 2000, 'rounded')
             	}else if(data.msg === "emptyPlan"){
             		window.location.href = "/plans.html";
             	}else{

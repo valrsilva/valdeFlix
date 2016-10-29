@@ -11,6 +11,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.thymeleaf.util.StringUtils;
 
 import com.google.gson.Gson;
@@ -27,465 +28,105 @@ import rx.schedulers.Schedulers;
 @Service
 public class MediaServiceImpl implements MediaService{
 
-	@Override
-	public List<Group> listMediaByUser(Long id) {
-		
-		long initTime = System.currentTimeMillis();
-		
-		System.out.println("LISTING..." + initTime);
-		
-		List<Group> resultList = new ArrayList<>();
-		Object monitor = new Object();
-		
-		synchronized (monitor) {
-			
-			/*System.out.println("1-INIT");
-			
-			Observable<Group> allMediaObservable = Observable.from(fetchAllMediaAvailable());
-			
-			allMediaObservable.subscribe((it) -> {
-				System.out.println("ALLMEDIA "  + it.getName());
-			});
-			
-			Observable<Group> favoriteByUserObservable = Observable.just(fetchAllFavoriteByUser());
-			
-			favoriteByUserObservable.subscribe((it) -> {
-				System.out.println("FAVORITE "  + it.getName());
-			});
-			
-			Observable<Group> recomendedByUserObservable = Observable.just(fetchAllRecomendedByUser());
-			
-			recomendedByUserObservable.subscribe((it) -> {
-				System.out.println("RECOMMENDED "  + it.getName());
-			});
-		
-			Func1<String, Observable<String>> funcFetcher = new Func1<String, Observable<String>>() {
-				@Override
-				public Observable<String> call(String t) {
-					return Observable.just(fetchImagePoster(t)).subscribeOn(Schedulers.computation());
-				}
-			};*/
-			
-			/*******
-			 * Future Task 1
-			 *******/
-			
-			FutureTask<List<Group>> futureTask = new FutureTask<List<Group>>(() -> {
-	            return fetchAllMediaAvailable();
-	        });
-
-		    Observable<List<Group>> from = Observable.from(futureTask);
-		    
-	        Schedulers.computation().createWorker().schedule(() -> {
-	        	futureTask.run();
-	        });
-	        
-	        Observable<Group> flatMap = from.flatMap((x) -> {
-	        	return Observable.from(x).subscribeOn(Schedulers.computation());
-			});
-	        
-	        /*******
-			 * Future Task 2
-			 *******/
-	        
-	        FutureTask<Group> futureTask2 = new FutureTask<Group>(() -> {
-	            return fetchAllFavoriteByUser();
-	        });
-
-		    Observable<Group> from2 = Observable.from(futureTask2);
-		    
-	        Schedulers.computation().createWorker().schedule(() -> {
-	        	futureTask2.run();
-	        });
-	        
-	        /*******
-			 * Future Task 3
-			 *******/
-	        
-	        FutureTask<Group> futureTask3 = new FutureTask<Group>(() -> {
-	            return fetchAllRecomendedByUser();
-	        });
-
-		    Observable<Group> from3 = Observable.from(futureTask3);
-		    
-	        Schedulers.computation().createWorker().schedule(() -> {
-	        	futureTask3.run();
-	        });
-	        
-	        /*******
-			 * Main Task
-			 *******/
-	        
-	        Observable<Group> allGroupsObservable = Observable.concat(flatMap, from2, from3).flatMap((it) -> {
-				return Observable.just(it).subscribeOn(Schedulers.computation()).map((x) -> {
-					x.getItems().forEach((m) -> {
-						m.setImage(fetchImagePoster(m.getName()));
-					});
-					return x;
-				});
-			});
-	        
-	        allGroupsObservable.subscribe((it) -> {
-				resultList.add(it);
-			}, (x) -> {
-				System.out.println(x);
-			}, () -> {
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});
-	        
-			/*Observable<Group> allGroupsObservable2 = Observable.concat(allMediaObservable, favoriteByUserObservable, recomendedByUserObservable).flatMap((it) -> {
-				return Observable.just(it).subscribeOn(Schedulers.computation()).map((x) -> {
-					x.getItems().forEach((m) -> {
-						funcFetcher.call(m.getName());
-					});
-					return x;
-				});
-			});
-			
-			allGroupsObservable2.subscribe((it) -> {
-				System.out.println("1-" + it);
-			}, (x) -> {
-				
-			}, () -> {
-				System.out.println("1-END");
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});*/
-			
-	        /*******
-	         * Working
-	         */
-			/*Observable<Group> allGroupsObservable = Observable.concat(allMediaObservable, favoriteByUserObservable, recomendedByUserObservable).flatMap((it) -> {
-				return Observable.just(it).subscribeOn(Schedulers.computation()).map((x) -> {
-					x.getItems().forEach((m) -> {
-						m.setImage(fetchImagePoster(m.getName()));
-					});
-					return x;
-				});
-			});
-			
-			allGroupsObservable.subscribe((it) -> {
-				System.out.println("1-" + it);
-				resultList.add(it);
-			}, (x) -> {
-				
-			}, () -> {
-				System.out.println("1-END");
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});*/
-		
-			/***
-			 * End Working
-			 */
-			
-			/*System.out.println("1-INIT");
-			
-			Observable<Group> allMediaObservable = Observable.from(fetchAllMediaAvailable()).subscribeOn(Schedulers.newThread());
-			Observable<Group> favoriteByUserObservable = Observable.just(fetchAllFavoriteByUser());
-			Observable<Group> recomendedByUserObservable = Observable.just(fetchAllRecomendedByUser());
-			List<Observable<Group>> tasksList = Arrays.asList(allMediaObservable, favoriteByUserObservable, recomendedByUserObservable);
-			
-			Observable.concat(allMediaObservable, favoriteByUserObservable, recomendedByUserObservable).flatMap((it) -> {
-				return Observable.just(it).subscribeOn(Schedulers.computation()).map((x) -> {
-					x.getItems().forEach((m) -> {
-						m.setImage(fetchImagePoster(m.getName()));
-					});
-					return x;
-				});
-			}).subscribe((it) -> {
-				System.out.println("1-" + it);
-				resultList.add(it);
-			}, (x) -> {
-				
-			}, () -> {
-				System.out.println("1-END");
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});*/
-			
-			/*
-			Observable.from(tasksList).flatMap((v) -> {
-				return v.subscribeOn(Schedulers.computation());
-			})
-			
-			Observable.from(tasksList).flatMap((v) -> {
-				return v.subscribeOn(Schedulers.computation());
-			})
-			.subscribe((it) -> {
-				
-				System.out.println("1-" + it);
-				
-				try {
-					Thread.sleep(100);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				System.out.println("2-INIT");
-				
-				Observable.just(it).flatMap((a)->{
-					return Observable.just(a).subscribeOn(Schedulers.computation()).map((x) -> {
-						x.getItems().forEach((m) -> {
-							m.setImage(fetchImagePoster(m.getName()));
-						});
-						return x;
-					});
-				}).subscribe((z) -> {
-					System.out.println("2-" + z);
-					try {
-						Thread.sleep(100);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					resultList.add(z);
-				}, (x) -> {
-					
-				}, () -> {
-					System.out.println("2-END");
-					synchronized (monitor) {
-						monitor.notify();
-					}
-				});
-				
-			}, (x) -> {
-				System.out.println(x);
-			}, () -> {
-				System.out.println("1-END");
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});
-			*/
-			/*Observable<Group> favoriteByUserObservable = Observable.just(fetchAllFavoriteByUser()).observeOn(Schedulers.io());
-			
-			favoriteByUserObservable.flatMap((a)->{
-				return Observable.just(a).subscribeOn(Schedulers.computation()).map((it) -> {
-					it.getItems().forEach((m) -> {
-						m.setImage(fetchImagePoster(m.getName()));
-					});
-					return it;
-				});
-			}).subscribe((it) -> {
-				System.out.println("1-" + it);
-				try {
-					Thread.sleep(100);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				//resultList.add(it);
-			}, (x) -> {
-				
-			}, () -> {
-				System.out.println("1-END");
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});*/
-			
-			/*Observable<Group> recomendedByUserObservable = Observable.just(fetchAllRecomendedByUser()).observeOn(Schedulers.io());
-			
-			favoriteByUserObservable.flatMap((a)->{
-				return Observable.just(a).subscribeOn(Schedulers.computation()).map((it) -> {
-					it.getItems().forEach((m) -> {
-						m.setImage(fetchImagePoster(m.getName()));
-					});
-					return it;
-				});
-			}).subscribe((it) -> {
-				resultList.add(it);
-			}, (x) -> {
-				System.out.println(x);
-			}, () -> {
-				
-			});*/
-			
-			/*Observable.zip(allMediaObservable, favoriteByUserObservable, recomendedByUserObservable, new Func3<Group, Group, Group, List<Group>>() {
-				@Override
-				public List<Group> call(Group t1, Group t2, Group t3) {
-					return Arrays.asList(t1,t2,t3);
-				}
-			})
-			.subscribeOn(Schedulers.io())
-			.subscribe((it) -> {
-				try {
-					Thread.sleep(100);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				System.out.println(it);
-			}, (x) -> {
-				System.out.println(x);
-			}, () -> {
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});*/
-			
-			try {
-				monitor.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			/*Observable<Group> favoriteByUserObservable = Observable.just(fetchAllFavoriteByUser());
-			favoriteByUserObservable.subscribeOn(Schedulers.io()).subscribe((it) -> {
-				it.getItems().forEach((m) -> {
-					m.setImage(fetchImagePoster(m.getName()));
-				});
-			});
-			
-			Observable<Group> recomendedByUserObservable = Observable.just(fetchAllRecomendedByUser());
-			favoriteByUserObservable.subscribeOn(Schedulers.io()).subscribe((it) -> {
-				it.getItems().forEach((m) -> {
-					m.setImage(fetchImagePoster(m.getName()));
-				});
-			});
-			
-			Observable.zip(allMediaObservable, favoriteByUserObservable, recomendedByUserObservable, 
-					new Func3<Group, Group, Group, List<Group>>() {
-
-				@Override
-				public List<Group> call(Group t1, Group t2, Group t3) {
-					System.out.println("onZip...");
-					return Arrays.asList(t1,t2,t3);
-				}
-				
-			}).subscribe((item) -> {
-					System.out.println("onSubscribe: " + item);
-					resultList.addAll(item);
-			}, (x) -> {
-				System.out.println(x);
-			}, () -> {
-				
-			});*/
-			
-			/*List<Observable<Group>> listGroup = Arrays.asList(allMediaObservable,favoriteByUserObservable,recomendedByUserObservable);
-			
-			whenAll(listGroup)
-				.subscribe((item) -> {
-					System.out.println("\nMedia ********** ");
-					System.out.println("Name: " + item);
-					System.out.println("Description: " + item.getName());
-					resultList.add(item);
-			}, (x) -> {
-				System.out.println(x);
-			}, () -> {
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});*/
-			
-			/*try {
-				monitor.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
-			
-		}
-		
-		System.out.println("END LISTING..." + (System.currentTimeMillis() - initTime));
-		
-		return resultList;
-		
-	}
-	
 	/*@Override
-	public List<Group> listMediaByUser(Long id) {
+	public void listMediaByUser(Long id, DeferredResult<List<Group>> deferredResult) {
+	
+		List<Group> resultado = new ArrayList<Group>();
 		
-		System.out.println("LISTING..." + System.currentTimeMillis());
+		Observable<Group> allMediaObservable = Observable.from(fetchAllMediaAvailable()).observeOn(Schedulers.newThread());
+		Observable<Group> favoriteByUserObservable = Observable.just(fetchAllFavoriteByUser());
+		Observable<Group> recomendedByUserObservable = Observable.just(fetchAllRecomendedByUser());
 		
-		List<Group> resultList = new ArrayList<>();
-		//Object monitor = new Object();
-		
-		//synchronized (monitor) {
-			
-			Observable<Group> allMediaObservable = Observable.from(fetchAllMediaAvailable());
-			allMediaObservable.subscribeOn(Schedulers.io()).subscribe((it) -> {
-				it.getItems().forEach((m) -> {
+		Observable.concat(allMediaObservable, favoriteByUserObservable, recomendedByUserObservable).observeOn(Schedulers.newThread()).flatMap((it) -> {
+			return Observable.just(it).subscribeOn(Schedulers.computation()).map((x) -> {
+				x.getItems().forEach((m) -> {
 					m.setImage(fetchImagePoster(m.getName()));
 				});
+				return x;
 			});
-			
-			Observable<Group> favoriteByUserObservable = Observable.just(fetchAllFavoriteByUser());
-			favoriteByUserObservable.subscribeOn(Schedulers.io()).subscribe((it) -> {
-				it.getItems().forEach((m) -> {
-					m.setImage(fetchImagePoster(m.getName()));
-				});
-			});
-			
-			Observable<Group> recomendedByUserObservable = Observable.just(fetchAllRecomendedByUser());
-			favoriteByUserObservable.subscribeOn(Schedulers.io()).subscribe((it) -> {
-				it.getItems().forEach((m) -> {
-					m.setImage(fetchImagePoster(m.getName()));
-				});
-			});
-			
-			Observable.zip(allMediaObservable, favoriteByUserObservable, recomendedByUserObservable, 
-					new Func3<Group, Group, Group, List<Group>>() {
-
-				@Override
-				public List<Group> call(Group t1, Group t2, Group t3) {
-					System.out.println("onZip...");
-					return Arrays.asList(t1,t2,t3);
-				}
-				
-			}).subscribe((item) -> {
-					System.out.println("onSubscribe: " + item);
-					resultList.addAll(item);
-			}, (x) -> {
-				System.out.println(x);
-			}, () -> {
-				
-			});
-			
-			List<Observable<Group>> listGroup = Arrays.asList(allMediaObservable,favoriteByUserObservable,recomendedByUserObservable);
-			
-			whenAll(listGroup)
-				.subscribe((item) -> {
-					System.out.println("\nMedia ********** ");
-					System.out.println("Name: " + item);
-					System.out.println("Description: " + item.getName());
-					resultList.add(item);
-			}, (x) -> {
-				System.out.println(x);
-			}, () -> {
-				synchronized (monitor) {
-					monitor.notify();
-				}
-			});
-			
-			try {
-				monitor.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-		//}
-		
-		System.out.println("END LISTING..." + System.currentTimeMillis());
-		
-		return resultList;
+		}).subscribe((it) -> {
+			resultado.add(it);
+		}, (x) -> {
+		}, () -> {
+			deferredResult.setResult(resultado);
+		});
 		
 	}*/
 	
-	public Observable<Group> whenAll(List<Observable<Group>> tasks) {
-	    return Observable.from(tasks)
-            //execute in parallel
-            .flatMap(task -> task.observeOn(Schedulers.computation()));
-            //wait, until all task are executed
-            //be aware, all your observable should emit onComplemete event
-            //otherwise you will wait forever
-            //.toList()
-            //could implement more intelligent logic. eg. check that everything is successful
-            //.map(results -> true);
-	}
+	@Override
+	public void listMediaByUser(Long id, DeferredResult<List<Group>> deferredResult) {
 	
+		List<Group> resultado = new ArrayList<Group>();
+		
+		/*******
+		 * Future Task 1
+		 *******/
+		
+		FutureTask<List<Group>> futureTask = new FutureTask<List<Group>>(() -> {
+            return fetchAllMediaAvailable();
+        });
+
+	    Observable<List<Group>> from = Observable.from(futureTask);
+	    
+        Schedulers.computation().createWorker().schedule(() -> {
+        	futureTask.run();
+        });
+        
+        Observable<Group> flatMap = from.flatMap((x) -> {
+        	return Observable.from(x).subscribeOn(Schedulers.computation());
+		});
+        
+        /*******
+		 * Future Task 2
+		 *******/
+        
+        FutureTask<Group> futureTask2 = new FutureTask<Group>(() -> {
+            return fetchAllFavoriteByUser();
+        });
+
+	    Observable<Group> from2 = Observable.from(futureTask2);
+	    
+        Schedulers.computation().createWorker().schedule(() -> {
+        	futureTask2.run();
+        });
+        
+        /*******
+		 * Future Task 3
+		 *******/
+        
+        FutureTask<Group> futureTask3 = new FutureTask<Group>(() -> {
+            return fetchAllRecomendedByUser();
+        });
+
+	    Observable<Group> from3 = Observable.from(futureTask3);
+	    
+        Schedulers.computation().createWorker().schedule(() -> {
+        	futureTask3.run();
+        });
+        
+        /*******
+		 * Main Task
+		 *******/
+        
+        Observable<Group> allGroupsObservable = Observable.concat(flatMap, from2, from3).flatMap((it) -> {
+			return Observable.just(it).subscribeOn(Schedulers.computation()).map((x) -> {
+				x.getItems().forEach((m) -> {
+					m.setImage(fetchImagePoster(m.getName()));
+				});
+				return x;
+			});
+		});
+        
+        allGroupsObservable.subscribe((it) -> {
+        	resultado.add(it);
+		}, (x) -> {
+			System.out.println(x);
+		}, () -> {
+			deferredResult.setResult(resultado);
+		});
+		
+	}
+		
 	private List<Group> fetchAllMediaAvailable(){
 		
 		/*try {
