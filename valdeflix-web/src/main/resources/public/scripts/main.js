@@ -2,6 +2,7 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
 	
 	var myApp = this;
 	
+	myApp.isLoading=false;
 	myApp.title="";
 	myApp.userName = "";
 	myApp.password = "";
@@ -37,20 +38,28 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
 			"message": ""
 		}
 	};
-	
+
 	myApp.carregarDados = function() {
-    			
+    	
+		myApp.isLoading = true;
+		
     	$http.get("http://localhost:8080/media?idUser=1",{
     		headers: {
     			'Content-type': 'application/json'
     		}
     	}).success(function(data, status) {
+    		
+    		myApp.isLoading = false;
+    		
             if (data.coderro > 0) {
                 alert(data.descerro);
             } else {
             	myApp.listItems = data;
             }
         }).error(function(data, status) {
+        	
+        	myApp.isLoading = false;
+        	
         	if(data.message === 'No instances available for valdeflix-media'){
         		myApp.mediaListNotAvailable = true;
         	}
@@ -60,6 +69,13 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
     
     myApp.login = function() {
     	
+    	if(!myApp.userName || !myApp.password){
+    		Materialize.toast('Please fill the Login Name and the Password', 2000, 'rounded');
+    		return false;
+    	}
+    	
+    	myApp.isLoading = true;
+    	
     	$http.post("http://localhost:8080/login",{
 			"username":  myApp.userName,
 			"password": myApp.password
@@ -68,6 +84,9 @@ angular.module('todoApp', []).controller('TodoListController', function($scope, 
 				'Content-Type': 'application/json'
 			}
 		}) .success(function(data, status) {
+			
+			myApp.isLoading = false;
+			
             if (data.coderro > 0) {
                 alert(data.descerro);
             } else {

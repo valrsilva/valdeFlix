@@ -12,6 +12,12 @@
 </head>
 <body style="background-color:#EEFF41" ng-cloak>
 	
+	<div id="loading" ng-show="myApp.isLoading === true">
+	  	<div class="progress" style="margin:0px; z-index: 1003; display: block;">
+	      <div class="indeterminate"></div>
+	  	</div>
+  	</div>
+  	
 	<div ng-show="myApp.mediaListNotAvailable === true" style="margin:15px">
 		Service unavailable, try again later.
 	</div>
@@ -51,7 +57,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-	<script src="scripts/main.js"></script>
+	<script src="scripts/list.js"></script>
 
 </body>
 </html>
