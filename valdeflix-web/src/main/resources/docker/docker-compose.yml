@@ -1,0 +1,4 @@
+user:
+  image: valdeflix-user
+movie:
+  image: valdeflix-media

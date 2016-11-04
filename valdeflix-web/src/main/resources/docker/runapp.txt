@@ -1,0 +1,11 @@
+docker build -t valdeco/myapp .
+docker run -p 8080:8080 valdeco/myapp 
+
+docker network create --subnet=172.18.0.0/16 mynet123
+docker run --net mynet123 --ip 172.18.0.22 valdeco/myapp 
+
+--remove all containers
+docker rm $(docker ps -a -q)
+
+--remove image
+docker rmi #imageid#
